@@ -21,7 +21,6 @@ A humble attempt of creating a digital human.
     Can either be excitatory (positive) or inhibitory (negative). 
   </details>
   <details>
-  <details>
   <summary>Signal</summary>
     Can be sent/received by Neurons.
   </details>
