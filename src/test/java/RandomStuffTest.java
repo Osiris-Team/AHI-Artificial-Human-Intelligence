@@ -6,7 +6,6 @@
  *  Please consult the file "LICENSE" for details.
  */
 
-import com.osiris.ai.Neuron;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -21,9 +20,9 @@ public class RandomStuffTest {
     void testIterationSpeed() throws InterruptedException {
         // Create a new thread for printing and resetting the counter
         Thread t = new Thread(() -> {
-            try{
-                while (true){
-                    System.out.println("Iterations per second: "+iterationsPerSecond);
+            try {
+                while (true) {
+                    System.out.println("Iterations per second: " + iterationsPerSecond);
                     iterationsPerSecond.set(0);
                     Thread.sleep(1000);
                 }
@@ -37,7 +36,7 @@ public class RandomStuffTest {
         // For 2 thread: 99928724
         // For 3 thread: 82243906
         // For loops are faster than while loops
-        Thread t1 = new Thread(()->{
+        Thread t1 = new Thread(() -> {
             while (true) {
                 for (long i = 0; i < Long.MAX_VALUE; i++) {
                     iterationsPerSecond.incrementAndGet();
@@ -46,7 +45,7 @@ public class RandomStuffTest {
         });
         t1.start();
 
-        Thread t2 = new Thread(()->{
+        Thread t2 = new Thread(() -> {
             while (true) {
                 for (long i = 0; i < Long.MAX_VALUE; i++) {
                     iterationsPerSecond.incrementAndGet();
@@ -55,7 +54,7 @@ public class RandomStuffTest {
         });
         t2.start();
 
-        Thread t3 = new Thread(()->{
+        Thread t3 = new Thread(() -> {
             while (true) {
                 for (long i = 0; i < Long.MAX_VALUE; i++) {
                     iterationsPerSecond.incrementAndGet();
@@ -73,12 +72,12 @@ public class RandomStuffTest {
     void testMapsFunctionalty() {
         Map<Integer, String> indexAndStringMap = new HashMap<>();
         for (int i = 0; i < 100; i++) {
-            indexAndStringMap.put(i, "Index should be "+i);
+            indexAndStringMap.put(i, "Index should be " + i);
         }
 
-        for (int i:
-             indexAndStringMap.keySet()) {
-            System.out.println("Index: "+i+" "+indexAndStringMap.get(i));
+        for (int i :
+                indexAndStringMap.keySet()) {
+            System.out.println("Index: " + i + " " + indexAndStringMap.get(i));
         }
     }
 }

@@ -1,9 +1,9 @@
-import com.osiris.ai.*;
-import com.osiris.ai.utils.UtilsTimeStopper;
+import com.osiris.ahi.Brain;
+import com.osiris.ahi.Neuron;
+import com.osiris.ahi.Signal;
+import com.osiris.ahi.Worker;
+import com.osiris.ahi.utils.UtilsTimeStopper;
 import org.junit.jupiter.api.Test;
-
-import java.io.OutputStream;
-import java.util.List;
 
 public class AIPlayground {
 
@@ -24,12 +24,12 @@ public class AIPlayground {
         // Wie sollte diese datei aussehen?
         // Welche sind die zeichen die am wenigsten platz verschwenden?
         timeStopper.stop();
-        System.out.println("Created brain in "+timeStopper.getSeconds()+" seconds!");
+        System.out.println("Created brain in " + timeStopper.getSeconds() + " seconds!");
 
         for (Worker w :
                 brain.getWorkers()) {
             w.actionsOnSignalDeathEvent.add(e -> {
-                System.out.println(e.getTimestamp().toString()+" Signal death! Total connections: "+w.getTotalCountSynapses());
+                System.out.println(e.getTimestamp().toString() + " Signal death! Total connections: " + w.getTotalCountSynapses());
             });
         }
 
@@ -38,7 +38,7 @@ public class AIPlayground {
             w.executeRunnableAndReturnItsThread(() -> {
                 Neuron n = w.getNeurons()[w.getStartIndex()];
                 n.fireSignal(new Signal(), n.getStrongestSynapse());
-                System.out.println("Fired Signal at index "+w.getStartIndex()+" Total Synapses: "+w.getTotalCountSynapses());
+                System.out.println("Fired Signal at index " + w.getStartIndex() + " Total Synapses: " + w.getTotalCountSynapses());
             });
         }
     }

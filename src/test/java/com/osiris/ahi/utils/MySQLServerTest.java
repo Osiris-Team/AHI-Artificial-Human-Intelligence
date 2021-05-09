@@ -6,11 +6,9 @@
  *  Please consult the file "LICENSE" for details.
  */
 
-package com.osiris.ai.utils;
+package com.osiris.ahi.utils;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class MySQLServerTest {
 

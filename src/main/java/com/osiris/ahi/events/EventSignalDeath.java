@@ -6,15 +6,15 @@
  *  Please consult the file "LICENSE" for details.
  */
 
-package com.osiris.ai.events;
+package com.osiris.ahi.events;
 
-import com.osiris.ai.Signal;
+import com.osiris.ahi.Signal;
 
 import java.sql.Timestamp;
 
 public class EventSignalDeath {
-    private Signal signal;
     private final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    private Signal signal;
 
     public EventSignalDeath(Signal signal) {
         this.signal = signal;

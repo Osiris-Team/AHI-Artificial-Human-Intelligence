@@ -6,9 +6,9 @@
  *  Please consult the file "LICENSE" for details.
  */
 
-package com.osiris.ai;
+package com.osiris.ahi;
 
-import com.osiris.ai.events.EventSignalDeath;
+import com.osiris.ahi.events.EventSignalDeath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public class Signal {
     public Signal() {
     }
 
-    public EventSignalDeath createAndGetDeathEvent(){
+    public EventSignalDeath createAndGetDeathEvent() {
         return new EventSignalDeath(this);
     }
 
@@ -36,6 +36,7 @@ public class Signal {
      * from one {@link Neuron} to another {@link Neuron}
      * via a {@link Synapse}, that {@link Synapse} gets
      * added to this {@link List<Synapse>}.
+     *
      * @return A list containing all passed {@link Synapse}s in chronological order.
      */
     public List<Synapse> getSynapsesPathList() {

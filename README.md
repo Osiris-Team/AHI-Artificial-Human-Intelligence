@@ -1,7 +1,13 @@
 # AHI-Artificial-Human-Intelligence
-A humble attempt of creating a digital human. 
+
+A humble attempt of creating a digital human.
+
+## Status
+
+This project is in development. Any help is welcome.
 
 ## Research
+
 <div>
   <details>
     <summary>Body</summary>

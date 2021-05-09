@@ -1,7 +1,5 @@
-package com.osiris.ai;
+package com.osiris.ahi;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -36,6 +34,7 @@ public class Brain {
      * the provided {@link Neuron}s and {@link Worker}s arrays. <br>
      * Note that these arrays get filled/overwritten
      * with new {@link Neuron}s and {@link Worker}s.
+     *
      * @param neurons A {@link Neuron}s array. Not null!
      * @param workers A {@link Worker}s array. Not null!
      * @throws Exception
@@ -49,8 +48,8 @@ public class Brain {
         Objects.requireNonNull(workers);
 
         // Empty check
-        if (neurons.length==0) throw new Exception("Neurons array must be bigger than 0!");
-        if (workers.length==0) throw new Exception("Workers array must be bigger than 0!");
+        if (neurons.length == 0) throw new Exception("Neurons array must be bigger than 0!");
+        if (workers.length == 0) throw new Exception("Workers array must be bigger than 0!");
 
         createWorkersAndNeurons();
     }
@@ -64,11 +63,10 @@ public class Brain {
     public void createWorkersAndNeurons() throws Exception {
         // Make sure that neurons/workers does
         // not produce a comma value.
-        if(neurons.length % 2 == 0){
+        if (neurons.length % 2 == 0) {
             if (workers.length % 2 == 0)
                 throw new Exception("Workers array size must be an odd number!");
-        }
-        else{
+        } else {
             if (workers.length % 2 != 0)
                 throw new Exception("Workers array size must be an even number!");
         }
@@ -79,10 +77,10 @@ public class Brain {
             int startIndex = 0;
             int endIndex = 0;
 
-            if (i!=0) startIndex = lastValue+1;
+            if (i != 0) startIndex = lastValue + 1;
             endIndex = (lastValue = lastValue + dividedValue);
 
-            System.out.println("Creating worker["+i+"] for neurons ["+startIndex+" to "+endIndex+"]");
+            System.out.println("Creating worker[" + i + "] for neurons [" + startIndex + " to " + endIndex + "]");
             Worker w = new Worker(this, startIndex, endIndex);
             workers[i] = w;
             // Create the neurons and set their workers
@@ -112,14 +110,14 @@ public class Brain {
     /**
      * Sets the {@link Neuron} at index i.
      */
-    public void set(int i, Neuron neuron){
+    public void set(int i, Neuron neuron) {
         neurons[i] = neuron;
     }
 
     /**
      * Returns the {@link Neuron} at index i.
      */
-    public Neuron get(int i){
+    public Neuron get(int i) {
         return neurons[i];
     }
 }

@@ -9,15 +9,15 @@ public class NeuronsFile {
 
     @Test
     void testReadAndWrite() throws IOException {
-        File file = new File(System.getProperty("user.dir")+"/src/test/test.neurons");
+        File file = new File(System.getProperty("user.dir") + "/src/test/test.neurons");
         if (file.exists()) file.delete();
         file.createNewFile();
-        for (byte b:
+        for (byte b :
                 System.lineSeparator().getBytes()) {
-            System.out.println("Line separator in bytes:"+b);
+            System.out.println("Line separator in bytes:" + b);
         }
 
-        try(OutputStream out = new FileOutputStream(file)){
+        try (OutputStream out = new FileOutputStream(file)) {
             // Idea is that each line represents one neuron
             // and the line contains the other neurons it is connected to
 

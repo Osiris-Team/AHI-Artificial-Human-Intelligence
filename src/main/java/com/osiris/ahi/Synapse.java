@@ -6,7 +6,7 @@
  *  Please consult the file "LICENSE" for details.
  */
 
-package com.osiris.ai;
+package com.osiris.ahi;
 
 import java.util.Objects;
 
@@ -40,9 +40,10 @@ public class Synapse {
     /**
      * Fires the provided signal to
      * the second Neuron.
+     *
      * @param signal The {@link Signal} to fire/pass over to the next {@link Neuron}.
      */
-    public void fireSignal(Signal signal){
+    public void fireSignal(Signal signal) {
         signal.getSynapsesPathList().add(this);
         neuron2.receiveSignalAndForward(signal);
     }

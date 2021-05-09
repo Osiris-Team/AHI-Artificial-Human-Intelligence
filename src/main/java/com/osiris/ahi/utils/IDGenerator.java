@@ -1,12 +1,11 @@
-package com.osiris.ai.utils;
+package com.osiris.ahi.utils;
 
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IDGenerator {
 
     /**
-     *
      * @param n amount of digits
      * @param r amount of maximum combinations
      * @return
@@ -42,10 +41,11 @@ public class IDGenerator {
      * unique ids.
      * These ids have the smallest
      * size possible.
+     *
      * @param amount of ids we want to return in the array.
      * @return
      */
-    public int[] getUniqueIds(int amount){
+    public int[] getUniqueIds(int amount) {
         int[] arrayResultIds = new int[amount];
         // We add stuff to the array until its full and throws an exception
         // Create a list which holds the current id.
@@ -80,17 +80,17 @@ public class IDGenerator {
             for (int j = 0; j < 10; j++) {
 
                 // Insert/add the ID into the results array
-                System.out.println(list.toString());
+                System.out.println(list);
                 arrayResultIds[i] = parseListElementsToInt(list);
                 amount++;
 
                 // Loop through all other values and increment them too.
                 // We loop backwards and exclude the first value(by <1 instead of <0), because we already got the parent loop for incrementing that.
                 for (int k = list.size(); k > 1; k--) {
-                    int valChild = list.get(k-1);
+                    int valChild = list.get(k - 1);
 
                     for (int l = 0; l < 10; l++) {
-                        System.out.println(list.toString());
+                        System.out.println(list);
                         arrayResultIds[i] = parseListElementsToInt(list);
                         amount++;
 
@@ -143,9 +143,10 @@ public class IDGenerator {
      * Example:
      * List: [0,1,2,3]
      * Returned int: 0123
+     *
      * @param list list to parse.
      */
-    private int parseListElementsToInt(List<Integer> list){
+    private int parseListElementsToInt(List<Integer> list) {
         StringBuilder resultIDStringBuilder = new StringBuilder();
         for (int queueValue :
                 list) {
