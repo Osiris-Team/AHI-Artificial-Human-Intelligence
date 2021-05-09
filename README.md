@@ -18,7 +18,7 @@ A humble attempt of creating a digital human.
   </details>
   <details>
   <summary>Neurotransmitter</summary>
-    Can either be excitatory (positive) or inhibatory (negative). 
+    Can either be excitatory (positive) or inhibitory (negative). 
   </details>
   <details>
   <details>
