@@ -23,9 +23,10 @@ A humble attempt of creating a digital human.
   <details>
   <summary>Signal</summary>
     Can be sent/received by Neurons.
+    Can die when its not forwarded to another Neuron.
   </details>
   <details>
   <summary>Memory</summary>
-    The path of a Signal.
+    The path of Neurons a Signal took until it died.
   </details>
 </div>
