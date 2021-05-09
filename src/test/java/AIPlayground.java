@@ -1,7 +1,7 @@
-import com.osiris.ahi.Brain;
-import com.osiris.ahi.Neuron;
-import com.osiris.ahi.Signal;
-import com.osiris.ahi.Worker;
+import com.osiris.ahi.organs.brain.Brain;
+import com.osiris.ahi.organs.brain.Neuron;
+import com.osiris.ahi.organs.brain.Signal;
+import com.osiris.ahi.organs.brain.Worker;
 import com.osiris.ahi.utils.UtilsTimeStopper;
 import org.junit.jupiter.api.Test;
 

@@ -8,7 +8,7 @@
 
 package com.osiris.ahi.events;
 
-import com.osiris.ahi.Signal;
+import com.osiris.ahi.organs.brain.Signal;
 
 import java.sql.Timestamp;
 

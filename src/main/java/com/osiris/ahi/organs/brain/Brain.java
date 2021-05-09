@@ -1,4 +1,4 @@
-package com.osiris.ahi;
+package com.osiris.ahi.organs.brain;
 
 import java.util.Objects;
 

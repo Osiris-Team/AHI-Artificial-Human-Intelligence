@@ -6,7 +6,7 @@
  *  Please consult the file "LICENSE" for details.
  */
 
-package com.osiris.ahi;
+package com.osiris.ahi.organs.brain;
 
 import com.osiris.ahi.events.EventSignalDeath;
 
