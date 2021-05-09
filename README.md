@@ -11,7 +11,7 @@ This project is in development. Any help is welcome.
 <div>
   <details>
     <summary>Body</summary>
-    Contains all organs for an functioning organism.
+    Contains all organs for a functioning organism.
     Has to have organs to interact with its surroundings (I/O Organs | Input/Output Organs).
   </details>
   <details>
