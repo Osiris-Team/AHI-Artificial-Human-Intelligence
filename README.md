@@ -20,16 +20,14 @@ This project is in development. Any help is welcome.
   </details>
   <details>
   <summary>Neuron</summary>
-    Receives/Sends Signals.
+    Can receive/send Signals.
+    Can connect to other Neurons, if it receives a positive Signal and currently is not connected.
   </details>
   <details>
-  <summary>Neurotransmitter</summary>
-    Can either be excitatory (positive) or inhibitory (negative). 
-  </details>
-  <details>
-  <summary>Signal</summary>
+  <summary>Signal/Neurotransmitter</summary>
     Can be sent/received by Neurons.
     Can die when its not forwarded to another Neuron.
+  Can either be excitatory (positive) or inhibitory (negative).
   </details>
   <details>
   <summary>Memory</summary>
