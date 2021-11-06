@@ -6,7 +6,6 @@ import java.util.SplittableRandom;
 
 public class Neuron {
     private Worker worker; // The brain this neuron is in.
-    private int maxSignalForwardCount;
     private int indexInArray;
 
     private List<Synapse> synapses = new ArrayList<>();
@@ -19,9 +18,8 @@ public class Neuron {
      * @param indexInArray The position/index of this {@link Neuron}
      *                     in the {@link Brain#getNeurons()} array.
      */
-    public Neuron(Worker worker, int maxSignalForwardCount, int indexInArray) {
+    public Neuron(Worker worker, int indexInArray) {
         this.worker = worker;
-        this.maxSignalForwardCount = maxSignalForwardCount;
         this.indexInArray = indexInArray;
     }
 
@@ -47,21 +45,6 @@ public class Neuron {
 
     public void setSynapses(List<Synapse> synapses) {
         this.synapses = synapses;
-    }
-
-    /**
-     * See {@link #setMaxSignalForwardCount(int)} for details.
-     */
-    public int getMaxSignalForwardCount() {
-        return maxSignalForwardCount;
-    }
-
-    /**
-     * {@link Signal}s which have a strength
-     * below this threshold will not trigger new {@link Signal}s.
-     */
-    public void setMaxSignalForwardCount(int maxSignalForwardCount) {
-        this.maxSignalForwardCount = maxSignalForwardCount;
     }
 
     /**
@@ -121,7 +104,29 @@ public class Neuron {
      */
     public synchronized Synapse getStrongestSynapse() {
         try {
-            return synapses.get(0);
+            if (synapses.isEmpty()){
+                Neuron nextNeuron = worker.getBrain().get(indexInArray + 1);
+                Synapse s;
+                if (nextNeuron!=null){
+                    s = new Synapse(this, nextNeuron);
+                } else{
+                    // Means this is the last synapse. Connect it to the start.
+                    s = new Synapse(this, worker.getBrain().get(0));
+                    synapses.add(s);
+                }
+                return s;
+            }else{
+                int highestStrength = 0;
+                Synapse synapse = null;
+                for (Synapse s :
+                        synapses) {
+                    if (highestStrength > s.getStrength()){
+                        highestStrength = s.getStrength();
+                        synapse = s;
+                    }
+                }
+                return synapse;
+            }
         } catch (Exception e) {
             return addAndGetSynapse();
         }
@@ -144,7 +149,7 @@ public class Neuron {
      * Else it fires the {@link Signal} through the strongest {@link Synapse}.
      */
     public synchronized void receiveSignalAndForward(Signal signal) {
-        if (signal.getSynapsesPathList().size() >= maxSignalForwardCount) {
+        if (signal.getStrength() < 0) {
             worker.executeActionsForEventSignalDeath(signal.createAndGetDeathEvent());
             return;
         }

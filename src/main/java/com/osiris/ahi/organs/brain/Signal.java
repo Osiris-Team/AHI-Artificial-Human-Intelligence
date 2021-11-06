@@ -23,8 +23,12 @@ import java.util.List;
  */
 public class Signal {
     private List<Synapse> synapsesPathList = new ArrayList<>();
+    private boolean isPositive;
+    private int strength;
 
-    public Signal() {
+    public Signal(boolean isPositive, int strength) {
+        this.isPositive = isPositive;
+        this.strength = strength;
     }
 
     public EventSignalDeath createAndGetDeathEvent() {
@@ -48,5 +52,17 @@ public class Signal {
      */
     public void setSynapsesPathList(List<Synapse> synapsesPathList) {
         this.synapsesPathList = synapsesPathList;
+    }
+
+    public boolean isPositive() {
+        return isPositive;
+    }
+
+    public void setStrength(int strength) {
+        this.strength = strength;
+    }
+
+    public int getStrength() {
+        return strength;
     }
 }

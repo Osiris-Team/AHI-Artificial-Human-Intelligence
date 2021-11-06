@@ -19,7 +19,7 @@ import java.util.Objects;
 public class Synapse {
     private Neuron neuron1;
     private Neuron neuron2;
-    //private Double strength;
+    private int strength;
 
     /**
      * A {@link Synapse} represents
@@ -48,6 +48,15 @@ public class Synapse {
         neuron2.receiveSignalAndForward(signal);
     }
 
+    public void receiveAndForwardSignal(Signal signal){
+        signal.setStrength(signal.getStrength()-1);
+        if (signal.isPositive()){
+            strength++;
+        } else {
+            strength--;
+        }
+    }
+
     public Neuron getNeuron1() {
         return neuron1;
     }
@@ -64,14 +73,13 @@ public class Synapse {
         this.neuron2 = neuron2;
     }
 
-    /*
-    public Double getStrength() {
+
+    public int getStrength() {
         return strength;
     }
 
-    public void setStrength(Double strength) {
+    public void setStrength(int strength) {
         this.strength = strength;
     }
 
-     */
 }

@@ -12,6 +12,8 @@ public class Brain {
     private Neuron[] neurons;
     private Worker[] workers;
 
+    private Thread workerStatusPrinterThread;
+
     /**
      * Creates a new brain with
      * 1 million {@link Neuron}s and
@@ -52,6 +54,29 @@ public class Brain {
         if (workers.length == 0) throw new Exception("Workers array must be bigger than 0!");
 
         createWorkersAndNeurons();
+        workerStatusPrinterThread = new Thread(() ->{
+            int dead = 0;
+            while(true){
+                System.out.println();
+                for (Worker w :
+                        workers) {
+                    if (w.isInterrupted() || !w.isAlive()){
+                        System.out.println("Thread dead: "+w);
+                        dead++;
+                    }
+                    else{
+                        System.out.println(w.getName()+" | Neurons: "+w.getStartNeuronIndex()
+                                +"-"+w.getEndNeuronIndex()+" | Time per "+Integer.MAX_VALUE+" steps: "+(w.getMsPerLoop()/1000)+"s ("+w.getMsPerLoop()+"ms)");
+                    }
+                }
+                if (dead==workers.length){
+                    System.out.println("All worker threads finished!");
+                    break;
+                }
+                dead = 0;
+            }
+        });
+        workerStatusPrinterThread.start();
     }
 
     /**
@@ -85,8 +110,9 @@ public class Brain {
             workers[i] = w;
             // Create the neurons and set their workers
             for (int f = startIndex; f < endIndex; f++) {
-                set(f, new Neuron(w, 5, f));
+                set(f, new Neuron(w, f));
             }
+            w.start();
             System.out.println("Success!");
         }
     }

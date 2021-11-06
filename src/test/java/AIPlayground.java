@@ -25,21 +25,5 @@ public class AIPlayground {
         // Welche sind die zeichen die am wenigsten platz verschwenden?
         timeStopper.stop();
         System.out.println("Created brain in " + timeStopper.getSeconds() + " seconds!");
-
-        for (Worker w :
-                brain.getWorkers()) {
-            w.actionsOnSignalDeathEvent.add(e -> {
-                System.out.println(e.getTimestamp().toString() + " Signal death! Total connections: " + w.getTotalCountSynapses());
-            });
-        }
-
-        for (Worker w :
-                brain.getWorkers()) {
-            w.executeRunnableAndReturnItsThread(() -> {
-                Neuron n = w.getNeurons()[w.getStartIndex()];
-                n.fireSignal(new Signal(), n.getStrongestSynapse());
-                System.out.println("Fired Signal at index " + w.getStartIndex() + " Total Synapses: " + w.getTotalCountSynapses());
-            });
-        }
     }
 }
