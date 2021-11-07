@@ -17,9 +17,9 @@ import java.util.Objects;
  * a {@link Signal} from Neuron 1 to Neuron 2.
  */
 public class Synapse {
-    private Neuron neuron1;
-    private Neuron neuron2;
-    private int strength;
+    private Neuron senderNeuron;
+    private Neuron receiverNeuron;
+    private int strength = 10;
 
     /**
      * A {@link Synapse} represents
@@ -27,13 +27,13 @@ public class Synapse {
      * It has the ability of transmitting
      * a {@link Signal} from Neuron 1 to Neuron 2.
      */
-    public Synapse(Neuron neuron1, Neuron neuron2) {
-        Objects.requireNonNull(neuron1);
-        Objects.requireNonNull(neuron2);
+    public Synapse(Neuron senderNeuron, Neuron receiverNeuron) {
+        Objects.requireNonNull(senderNeuron);
+        Objects.requireNonNull(receiverNeuron);
         //if (strength>1.0 || strength<0)
         //    throw new NullPointerException("Strength must be a value between 0.0 and 1.0");
-        this.neuron1 = neuron1;
-        this.neuron2 = neuron2;
+        this.senderNeuron = senderNeuron;
+        this.receiverNeuron = receiverNeuron;
         //this.strength = strength;
     }
 
@@ -45,32 +45,29 @@ public class Synapse {
      */
     public void fireSignal(Signal signal) {
         signal.getSynapsesPathList().add(this);
-        neuron2.receiveSignalAndForward(signal);
-    }
-
-    public void receiveAndForwardSignal(Signal signal){
-        signal.setStrength(signal.getStrength()-1);
+        signal.setStrength(signal.getStrength() - 1);
         if (signal.isPositive()){
-            strength++;
+            strength++; // Enhance this synapses strength
         } else {
-            strength--;
+            strength--; // Decrease this synapses strength
         }
+        receiverNeuron.receiveSignalAndForward(signal);
     }
 
-    public Neuron getNeuron1() {
-        return neuron1;
+    public Neuron getSenderNeuron() {
+        return senderNeuron;
     }
 
-    public void setNeuron1(Neuron neuron1) {
-        this.neuron1 = neuron1;
+    public void setSenderNeuron(Neuron senderNeuron) {
+        this.senderNeuron = senderNeuron;
     }
 
-    public Neuron getNeuron2() {
-        return neuron2;
+    public Neuron getReceiverNeuron() {
+        return receiverNeuron;
     }
 
-    public void setNeuron2(Neuron neuron2) {
-        this.neuron2 = neuron2;
+    public void setReceiverNeuron(Neuron receiverNeuron) {
+        this.receiverNeuron = receiverNeuron;
     }
 
 

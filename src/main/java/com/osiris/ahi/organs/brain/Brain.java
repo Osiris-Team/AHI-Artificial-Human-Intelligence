@@ -1,5 +1,10 @@
 package com.osiris.ahi.organs.brain;
 
+import com.osiris.ahi.events.EventSignalDeath;
+import com.osiris.ahi.events.Eventable;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -8,11 +13,11 @@ import java.util.Objects;
  * {@link Worker}s which interact with
  * these.
  */
-public class Brain {
+public class Brain extends Thread{
     private Neuron[] neurons;
-    private Worker[] workers;
 
     private Thread workerStatusPrinterThread;
+    private long msPerLoop = -1;
 
     /**
      * Creates a new brain with
@@ -21,14 +26,14 @@ public class Brain {
      * See {@link #Brain(Neuron[], Worker[])} for details.
      */
     public Brain() throws Exception {
-        this(new Neuron[1000000], new Worker[5]);
+        this(new Neuron[1000000]);
     }
 
     /**
      * See {@link #Brain(Neuron[], Worker[])} for details.
      */
-    public Brain(int neuronsAmount, int workersAmount) throws Exception {
-        this(new Neuron[neuronsAmount], new Worker[workersAmount]);
+    public Brain(int neuronsAmount) throws Exception {
+        this(new Neuron[neuronsAmount]);
     }
 
     /**
@@ -41,80 +46,118 @@ public class Brain {
      * @param workers A {@link Worker}s array. Not null!
      * @throws Exception
      */
-    public Brain(Neuron[] neurons, Worker[] workers) throws Exception {
+    public Brain(Neuron[] neurons) throws Exception {
         this.neurons = neurons;
-        this.workers = workers;
 
         // Null check
         Objects.requireNonNull(neurons);
-        Objects.requireNonNull(workers);
 
         // Empty check
         if (neurons.length == 0) throw new Exception("Neurons array must be bigger than 0!");
-        if (workers.length == 0) throw new Exception("Workers array must be bigger than 0!");
 
-        createWorkersAndNeurons();
+        for (int i = 0; i < neurons.length; i++) {
+            set(i, new Neuron(i));
+        }
+        this.start();
+
         workerStatusPrinterThread = new Thread(() ->{
-            int dead = 0;
-            while(true){
-                System.out.println();
-                for (Worker w :
-                        workers) {
-                    if (w.isInterrupted() || !w.isAlive()){
-                        System.out.println("Thread dead: "+w);
-                        dead++;
+            try{
+                while(true){
+                    Thread.sleep(1000);
+                    if (this.isInterrupted() || !this.isAlive()){
+                        System.out.println("Thread dead: "+this);
+                        break;
                     }
                     else{
-                        System.out.println(w.getName()+" | Neurons: "+w.getStartNeuronIndex()
-                                +"-"+w.getEndNeuronIndex()+" | Time per "+Integer.MAX_VALUE+" steps: "+(w.getMsPerLoop()/1000)+"s ("+w.getMsPerLoop()+"ms)");
+                        System.out.println(this.getName()+" | Neurons: "+neurons.length+" | Time per "+Integer.MAX_VALUE+" steps: "+(msPerLoop/1000)+"s ("+msPerLoop+"ms)");
                     }
                 }
-                if (dead==workers.length){
-                    System.out.println("All worker threads finished!");
-                    break;
-                }
-                dead = 0;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
         workerStatusPrinterThread.start();
     }
 
-    /**
-     * Creates the {@link Worker}s and {@link Neuron}s. <br>
-     * Each worker needs a start and end index for
-     * the part of the {@link Brain} it gets assigned to. <br>
-     * Aka the part in the {@link Neuron}s array it gets to work with.
-     */
-    public void createWorkersAndNeurons() throws Exception {
-        // Make sure that neurons/workers does
-        // not produce a comma value.
-        if (neurons.length % 2 == 0) {
-            if (workers.length % 2 == 0)
-                throw new Exception("Workers array size must be an odd number!");
-        } else {
-            if (workers.length % 2 != 0)
-                throw new Exception("Workers array size must be an even number!");
-        }
+    @Override
+    public void run() {
+        super.run();
+        while(true){
+            try{
+                long start = System.currentTimeMillis();
+                for (int i = 0; i < Integer.MAX_VALUE; i++) {
+                    // The first loop should remove dead synapses
+                    for (int j = 0; j < neurons.length; j++) {
+                        Neuron n = neurons[j];
+                        List<Synapse> toRemove = new ArrayList<>(2);
+                        for (Synapse s :
+                                n.getSynapses()) {
+                            toRemove.add(s);
+                        }
+                        for (Synapse s :
+                                toRemove) {
+                            if (s.getStrength() < 1) {
+                                s.getSenderNeuron().getSynapses().remove(s);
+                                s.getReceiverNeuron().getSynapses().remove(s);
+                            }
+                        }
+                    }
 
-        int dividedValue = neurons.length / workers.length;
-        int lastValue = 0;
-        for (int i = 0; i < workers.length; i++) {
-            int startIndex = 0;
-            int endIndex = 0;
-
-            if (i != 0) startIndex = lastValue + 1;
-            endIndex = (lastValue = lastValue + dividedValue);
-
-            System.out.println("Creating worker[" + i + "] for neurons [" + startIndex + " to " + endIndex + "]");
-            Worker w = new Worker(this, startIndex, endIndex);
-            workers[i] = w;
-            // Create the neurons and set their workers
-            for (int f = startIndex; f < endIndex; f++) {
-                set(f, new Neuron(w, f));
+                    // Then we fire a positive signal at the first and last neurons
+                    fireSignal(neurons[0]);
+                    fireSignal(neurons[neurons.length-1]);
+                }
+                msPerLoop = System.currentTimeMillis() - start;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            w.start();
-            System.out.println("Success!");
+
         }
+    }
+
+    public synchronized Signal fireSignal(Neuron senderNeuron){
+        Synapse synapse = null;
+        if(senderNeuron.getSynapses().size() == 0){
+            // Connect with neighbor Neuron
+            Neuron receiverNeuron = null;
+            try{
+                receiverNeuron = neurons[senderNeuron.getIndexInArray()+1];
+            } catch (Exception e) {
+                receiverNeuron = neurons[0]; // Back to first Neuron
+            }
+            synapse = connectNeurons(senderNeuron, receiverNeuron);
+        } else{
+            synapse = senderNeuron.getStrongestOrRandomSynapse(); // Null is impossible
+        }
+        Signal signal = new Signal(true, 100, event -> {
+            //System.out.println("Signal died with strength "+event.getSignal().getStrength()+ " at "+event.getTimestamp().toString());
+        });
+        synapse.fireSignal(signal);
+        return signal;
+    }
+
+    /**
+     * Connects this {@link Neuron} to the neighboring {@link Neuron} by creating a new connection ({@link Synapse})
+     * between them and adding it to this {@link Neuron}s {@link Synapse}s list. <br>
+     * - Note that only a total of 10 connections are allowed! <br>
+     * - This {@link Synapse} gets added to the front of the list. <br>
+     * - If the neighboring {@link Neuron} already is connected, try the next neighbor and so on...
+     *
+     * @param neuron   the {@link Neuron} to connect to.
+     * @param strength a value between 0 and 1. The closer to 1, the stronger is the connection.
+     */
+    public synchronized Synapse connectNeurons(Neuron senderNeuron, Neuron receiverNeuron) {
+        // Check if this Neuron is already connected
+        for (Synapse s :
+                senderNeuron.getSynapses()) {
+            if (s.getReceiverNeuron().equals(receiverNeuron)) {
+                return s;
+            }
+        }
+
+        Synapse s = new Synapse(senderNeuron, receiverNeuron);
+        senderNeuron.getSynapses().add(s); // Add this synapse only to the sender neuron
+        return s;
     }
 
     public Neuron[] getNeurons() {
@@ -123,14 +166,6 @@ public class Brain {
 
     public void setNeurons(Neuron[] neurons) {
         this.neurons = neurons;
-    }
-
-    public Worker[] getWorkers() {
-        return workers;
-    }
-
-    public void setWorkers(Worker[] workers) {
-        this.workers = workers;
     }
 
     /**

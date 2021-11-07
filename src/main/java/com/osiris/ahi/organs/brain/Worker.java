@@ -26,7 +26,7 @@ public class Worker extends Thread{
      * <p>
      * {@link Neuron}
      */
-    public List<Eventable<EventSignalDeath>> actionsOnSignalDeathEvent = new ArrayList<>();
+
     private Brain brain;
     private Neuron[] neurons;
     private int startNeuronIndex;
@@ -44,7 +44,6 @@ public class Worker extends Thread{
      * @param endNeuronIndex   the end neuron index.
      */
     public Worker(Brain brain, int startNeuronIndex, int endNeuronIndex) {
-        super();
         this.brain = brain;
         this.neurons = brain.getNeurons();
         this.startNeuronIndex = startNeuronIndex;
@@ -68,8 +67,8 @@ public class Worker extends Thread{
                         for (Synapse s :
                                 toRemove) {
                             if (s.getStrength() < 0) {
-                                s.getNeuron1().getSynapses().remove(s);
-                                s.getNeuron2().getSynapses().remove(s);
+                                s.getSenderNeuron().getSynapses().remove(s);
+                                s.getReceiverNeuron().getSynapses().remove(s);
                             }
                         }
                     }
@@ -86,8 +85,8 @@ public class Worker extends Thread{
                         for (Synapse s :
                                 toRemove) {
                             if (s.getStrength() < 0) {
-                                s.getNeuron1().getSynapses().remove(s);
-                                s.getNeuron2().getSynapses().remove(s);
+                                s.getSenderNeuron().getSynapses().remove(s);
+                                s.getReceiverNeuron().getSynapses().remove(s);
                             }
                         }
                     }
@@ -98,16 +97,6 @@ public class Worker extends Thread{
             }
 
         }
-    }
-
-    public synchronized void executeActionsForEventSignalDeath(EventSignalDeath event) {
-        actionsOnSignalDeathEvent.forEach(action -> {
-            try {
-                action.runOnEvent(event);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
     }
 
     public void addRunnable(Runnable runnable) {

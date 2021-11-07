@@ -2,12 +2,11 @@ package com.osiris.ahi.organs.brain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.SplittableRandom;
 
 public class Neuron {
-    private Worker worker; // The brain this neuron is in.
     private int indexInArray;
-
     private List<Synapse> synapses = new ArrayList<>();
 
     /**
@@ -18,8 +17,7 @@ public class Neuron {
      * @param indexInArray The position/index of this {@link Neuron}
      *                     in the {@link Brain#getNeurons()} array.
      */
-    public Neuron(Worker worker, int indexInArray) {
-        this.worker = worker;
+    public Neuron(int indexInArray) {
         this.indexInArray = indexInArray;
     }
 
@@ -31,106 +29,74 @@ public class Neuron {
         this.indexInArray = indexInArray;
     }
 
-    public Worker getWorker() {
-        return worker;
-    }
-
-    public void setWorker(Worker worker) {
-        this.worker = worker;
-    }
-
     public List<Synapse> getSynapses() {
         return synapses;
-    }
-
-    public void setSynapses(List<Synapse> synapses) {
-        this.synapses = synapses;
-    }
-
-    /**
-     * Connects this {@link Neuron} to the neighboring {@link Neuron} by creating a new connection ({@link Synapse})
-     * between them and adding it to this {@link Neuron}s {@link Synapse}s list. <br>
-     * - Note that only a total of 10 connections are allowed! <br>
-     * - This {@link Synapse} gets added to the front of the list. <br>
-     * - If the neighboring {@link Neuron} already is connected, try the next neighbor and so on...
-     *
-     * @param neuron   the {@link Neuron} to connect to.
-     * @param strength a value between 0 and 1. The closer to 1, the stronger is the connection.
-     */
-    public synchronized Synapse addAndGetSynapse() {
-        if (synapses.size() >= 10) return null; // This neuron has already 10 connections to other neurons!
-
-        boolean add;
-        for (int i = indexInArray + 1; i < worker.getNeurons().length; i++) {
-            add = true;
-            // Check if this Neuron is already connected
-            for (Synapse s :
-                    synapses) {
-                if (s.getNeuron2().equals(this)) {
-                    add = false;
-                    break;
-                }
-            }
-
-            if (add) {
-                Synapse s = new Synapse(this, worker.getNeurons()[i]);
-                synapses.add(s);
-                worker.incrementAndGetTotalCountSynapses();
-                return s;
-            }
-        }
-        return null;
     }
 
     /**
      * Removes the provided {@link Neuron} from this Neurons connections.
      */
     public synchronized void removeSynapse(Neuron neuron) {
-        Synapse synapseToRemove = null;
-        for (Synapse s :
-                synapses) {
-            if (s.getNeuron2().equals(neuron)) {
-                synapseToRemove = s;
-                break;
+        synchronized (synapses){
+            Synapse synapseToRemove = null;
+            for (Synapse s :
+                    synapses) {
+                if (s.getReceiverNeuron().equals(neuron)) {
+                    synapseToRemove = s;
+                    break;
+                }
             }
+            if (synapseToRemove != null)
+                synapses.remove(synapseToRemove);
         }
-        if (synapseToRemove != null)
-            synapses.remove(synapseToRemove);
     }
 
     /**
-     * The strongest connection({@link Synapse}) is
-     * always the first one in the  list.
+     *
+     * @return null if no Synapses exist for this Neuron.
      */
-    public synchronized Synapse getStrongestSynapse() {
-        try {
-            if (synapses.isEmpty()){
-                Neuron nextNeuron = worker.getBrain().get(indexInArray + 1);
-                Synapse s;
-                if (nextNeuron!=null){
-                    s = new Synapse(this, nextNeuron);
-                } else{
-                    // Means this is the last synapse. Connect it to the start.
-                    s = new Synapse(this, worker.getBrain().get(0));
-                    synapses.add(s);
+    public Synapse getStrongestSynapse() {
+        synchronized (synapses){
+            int highestStrength = 0;
+            Synapse synapse = null;
+            for (Synapse s :
+                    synapses) {
+                if (highestStrength < s.getStrength()){
+                    highestStrength = s.getStrength();
+                    synapse = s;
                 }
-                return s;
-            }else{
-                int highestStrength = 0;
-                Synapse synapse = null;
-                for (Synapse s :
-                        synapses) {
-                    if (highestStrength > s.getStrength()){
-                        highestStrength = s.getStrength();
-                        synapse = s;
-                    }
-                }
-                return synapse;
             }
-        } catch (Exception e) {
-            return addAndGetSynapse();
+            return synapse;
         }
     }
+
+    /**
+     *
+     * @return null if no Synapses exist for this Neuron.
+     */
+    public Synapse getRandomSynapse(){
+        synchronized (synapses){
+            if (synapses.size() != 0)
+                if ((synapses.size()-1) == 0)
+                    return synapses.get(0);
+                else
+                    return synapses.get(new Random().nextInt(synapses.size()-1));
+            else
+                return null;
+        }
+    }
+
+    /**
+     * Returns a random Synapse with a 10% chance, otherwise the strongest.
+     */
+    public Synapse getStrongestOrRandomSynapse(){
+        SplittableRandom random = new SplittableRandom();
+        if (random.nextInt(0, 10) == 9)
+            return getRandomSynapse();
+        else
+            return getStrongestSynapse();
+    }
+
 
     /**
      * Fires the {@link Signal} over the provided {@link Synapse}.
@@ -149,32 +115,25 @@ public class Neuron {
      * Else it fires the {@link Signal} through the strongest {@link Synapse}.
      */
     public synchronized void receiveSignalAndForward(Signal signal) {
-        if (signal.getStrength() < 0) {
-            worker.executeActionsForEventSignalDeath(signal.createAndGetDeathEvent());
+        if (signal.getStrength() < 1) {
+            try{
+                signal.die();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return;
         }
 
         // Theres a 10% chance of using another Synapse instead of the strongest one
-        Synapse forwardingSynapse = null;
-        SplittableRandom random = new SplittableRandom();
-        if (random.nextInt(0, 10) == 9) {
-            int index = random.nextInt(0, 9);
-            try {
-                forwardingSynapse = synapses.get(index);
+        Synapse forwardingSynapse = getStrongestOrRandomSynapse();
+        if (forwardingSynapse==null)
+            try{
+                signal.die();
             } catch (Exception e) {
-                // If this connection doesn't exist yet create it
-                forwardingSynapse = addAndGetSynapse();
+                e.printStackTrace();
             }
-        } else
-            try {
-                forwardingSynapse = getStrongestSynapse();
-            } catch (Exception e) {
-                // If this connection doesn't exist yet create it
-                forwardingSynapse = addAndGetSynapse();
-            }
-
-
-        fireSignal(signal, forwardingSynapse);
+        else
+            fireSignal(signal, forwardingSynapse);
     }
 
 }

@@ -9,30 +9,29 @@
 package com.osiris.ahi.organs.brain;
 
 import com.osiris.ahi.events.EventSignalDeath;
+import com.osiris.ahi.events.Eventable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Can change the strength of a {@link Synapse}(connection).
  * It also has its own strength, which
  * decreases with each new {@link Neuron} it reaches. <br>
- * When this {@link Signal}s strength is below the
- * {@link Neuron#getMaxSignalForwardCount()} the {@link Signal} dies
+ * When this {@link Signal}s strength is below the {@link Signal} dies
  * and throws a {@link EventSignalDeath}.
  */
 public class Signal {
     private List<Synapse> synapsesPathList = new ArrayList<>();
     private boolean isPositive;
     private int strength;
+    private Eventable<EventSignalDeath> onDeath;
 
-    public Signal(boolean isPositive, int strength) {
+    public Signal(boolean isPositive, int strength, Eventable<EventSignalDeath> onDeath) {
         this.isPositive = isPositive;
         this.strength = strength;
-    }
-
-    public EventSignalDeath createAndGetDeathEvent() {
-        return new EventSignalDeath(this);
+        this.onDeath = onDeath;
     }
 
     /**
@@ -64,5 +63,9 @@ public class Signal {
 
     public int getStrength() {
         return strength;
+    }
+
+    public void die() throws Exception {
+        onDeath.runOnEvent(new EventSignalDeath(this));
     }
 }
