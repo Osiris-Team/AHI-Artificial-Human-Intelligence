@@ -1,3 +1,4 @@
+import com.osiris.ahi.Human;
 import com.osiris.ahi.organs.brain.Brain;
 import com.osiris.ahi.organs.brain.Neuron;
 import com.osiris.ahi.organs.brain.Signal;
@@ -12,18 +13,11 @@ public class AIPlayground {
         // Utils
         UtilsTimeStopper timeStopper = new UtilsTimeStopper();
 
-        // Create brain based on human biology:
-        // 100 billion neurons | We use 0,1% which are 1 million neurons
-        // 10000 connections per neuron | We use 0,1% which are 10 connections
-        System.out.println("Creating brain...");
-        int neuronsAmount = 1000000;
+        System.out.println("Creating new human...");
         timeStopper.start();
-        Brain brain = new Brain(neuronsAmount);
-        // 100 billion neurons are too much for memory. Save them to a file.
-        // Wie sollte diese datei aussehen?
-        // Welche sind die zeichen die am wenigsten platz verschwenden?
+        Human peter = new Human();
         timeStopper.stop();
-        System.out.println("Created brain in " + timeStopper.getSeconds() + " seconds!");
+        System.out.println("Created human in " + timeStopper.getSeconds() + " seconds or "+timeStopper.getMillis()+"milliseconds!");
         Thread.sleep(30000);
     }
 }

@@ -1,8 +1,5 @@
 package com.osiris.ahi.organs.brain;
 
-import com.osiris.ahi.events.EventSignalDeath;
-import com.osiris.ahi.events.Eventable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,7 +14,7 @@ public class Brain extends Thread{
     private Neuron[] neurons;
 
     private Thread workerStatusPrinterThread;
-    private long msPerLoop = -1;
+    private int indexInLoop = 0;
 
     /**
      * Creates a new brain with
@@ -64,12 +61,14 @@ public class Brain extends Thread{
             try{
                 while(true){
                     Thread.sleep(1000);
+                    long loopsPerSecond = 0;
                     if (this.isInterrupted() || !this.isAlive()){
                         System.out.println("Thread dead: "+this);
                         break;
                     }
                     else{
-                        System.out.println(this.getName()+" | Neurons: "+neurons.length+" | Time per "+Integer.MAX_VALUE+" steps: "+(msPerLoop/1000)+"s ("+msPerLoop+"ms)");
+                        loopsPerSecond = indexInLoop - loopsPerSecond;
+                        System.out.println(this.getName()+" | Neurons: "+neurons.length+" | Hz: "+loopsPerSecond);
                     }
                 }
             } catch (Exception e) {
@@ -84,8 +83,8 @@ public class Brain extends Thread{
         super.run();
         while(true){
             try{
-                long start = System.currentTimeMillis();
                 for (int i = 0; i < Integer.MAX_VALUE; i++) {
+                    indexInLoop = i;
                     // The first loop should remove dead synapses
                     for (int j = 0; j < neurons.length; j++) {
                         Neuron n = neurons[j];
@@ -107,7 +106,6 @@ public class Brain extends Thread{
                     fireSignal(neurons[0]);
                     fireSignal(neurons[neurons.length-1]);
                 }
-                msPerLoop = System.currentTimeMillis() - start;
             } catch (Exception e) {
                 e.printStackTrace();
             }
